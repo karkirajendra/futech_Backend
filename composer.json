@@ -8,9 +8,13 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0",
+<<<<<<< HEAD:composer.json
         "laravel/sanctum": "^4.2",
         "laravel/tinker": "^2.10.1",
         "pragmarx/google2fa": "^9.0",
+=======
+        "laravel/tinker": "^2.10.1",
+>>>>>>> f5b4733 (auth creation):backend/composer.json
         "tymon/jwt-auth": "^2.2"
     },
     "require-dev": {
