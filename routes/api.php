@@ -6,15 +6,18 @@ use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Middleware\EnsureTokenIsValid;
 
-Route::apiResource('blogs', BlogController::class);
+Route::middleware('auth:sanctum')->group(function(){
+    Route::get('/blogs', [BlogController::class,'index']);
+    Route::post('/blogs', [BlogController::class,'store']);
+    Route::get('/blogs/{id}', [BlogController::class,'show']);
+    Route::put('/blogs/{id}', [BlogController::class,'update']);
+    Route::delete('/blogs/{id}', [BlogController::class,'destroy']);
+});
+
 
 
 Route::post('/register', [AuthController::class,'register']);
 Route::post('/login', [AuthController::class,'login']);
 
-Route::middleware('auth:sanctum')->group(function(){
-    Route::get('/email/verify/{id}/{hash}', [AuthController::class,'verifyEmail'])->name('verification.verify');
-    Route::post('/email/resend', [AuthController::class,'resendVerification']);
-});
 
 

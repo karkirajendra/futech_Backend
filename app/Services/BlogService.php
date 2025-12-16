@@ -1,31 +1,48 @@
 <?php
-
 namespace App\Services;
 
 use App\Models\Blog;
-use Illuminate\Support\Facades\Auth;
 
 class BlogService
 {
-    public function create(array $data): Blog {
-        $data['user_id'] = Auth::id(); // basic user
+    public function getAllBlogs()
+    {
+        return Blog::with('user')->latest()->get();
+    }
+
+    public function getBlog($id)
+    {
+        return Blog::with('user', 'comments')->findOrFail($id);
+    }
+
+    public function createBlog($data, $user)
+    {
+        $data['user_id'] = $user->id;
+        if(isset($data['image'])){
+            $data['image'] = $data['image']->store('blogs', 'public');
+        }
         return Blog::create($data);
     }
 
-    public function update(Blog $blog, array $data): Blog {
+    public function updateBlog($id, $data, $user)
+    {
+        $blog = Blog::findOrFail($id);
+        if($blog->user_id !== $user->id){
+            abort(403, 'Unauthorized');
+        }
+        if(isset($data['image'])){
+            $data['image'] = $data['image']->store('blogs', 'public');
+        }
         $blog->update($data);
         return $blog;
     }
 
-    public function delete(Blog $blog): void {
+    public function deleteBlog($id, $user)
+    {
+        $blog = Blog::findOrFail($id);
+        if($blog->user_id !== $user->id){
+            abort(403, 'Unauthorized');
+        }
         $blog->delete();
-    }
-
-    public function list() {
-        return Blog::with('user')->latest()->get();
-    }
-
-    public function find(Blog $blog){
-        return $blog->load('user');
     }
 }
