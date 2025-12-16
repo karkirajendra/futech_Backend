@@ -14,7 +14,24 @@ class AuthService
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
+
     }
+      public function verifyEmail(EmailVerificationRequest $request){
+            $request->fulfill();
+            return['message'=>'Email verified successfully'];
+        }
+
+        public function resendVerification(Request $request){
+            $user = $request->user();
+
+            if ($user->hasVerifiedEmail()){
+                return ['message'=>'Email already Verified'];
+            }
+                $user->sendEmailVerificationNotification();
+                return ['message'=> 'Verification Email resent'];
+
+        }
+
 
 
     public function login(array $data): User|bool
