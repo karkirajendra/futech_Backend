@@ -2,6 +2,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
 use Illuminate\Http\Request;
 use App\Services\AuthService;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -17,24 +19,9 @@ class AuthController extends Controller
     }
 
 //register
-    public function register(Request $request): JsonResponse
+    public function register(RegisterRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => [
-                'required',
-                'string',
-                'min:6',
-                'confirmed',
-                // 'regex:/[a-z]/',
-                // 'regex:/[A-Z]/',
-                // 'regex:/[0-9]/',
-                // 'regex:/[@$!%*#?&]/',
-            ],
-        ]);
-
-        $user = $this->authService->register($validated);
+        $user = $this->authService->register($request->validated());
         $user->sendEmailVerificationNotification();
 
         return response()->json([
@@ -62,14 +49,9 @@ class AuthController extends Controller
     }
 
   //login user
-    public function login(Request $request): JsonResponse
+    public function login(LoginRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
-
-        $user = $this->authService->login($validated);
+        $user = $this->authService->login($request->validated());
 
         if (!$user) {
             return response()->json([
