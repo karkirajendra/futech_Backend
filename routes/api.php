@@ -43,12 +43,18 @@ Route::prefix('auth')->group(function () {
 Route::prefix('blogs')->group(function () {
     Route::get('/', [BlogController::class, 'index'])
         ->name('blogs.index');
+
     Route::get('/{id}', [BlogController::class, 'show'])
         ->name('blogs.show')
         ->where('id', '[0-9]+');
+
     Route::get('/user/{userId}', [BlogController::class, 'userBlogs'])
         ->name('blogs.user')
         ->where('userId', '[0-9]+');
+
+    // Add POST route here
+    Route::post('/', [BlogController::class, 'store'])
+        ->name('blogs.store');
 });
 
 

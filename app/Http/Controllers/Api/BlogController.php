@@ -72,7 +72,7 @@ class BlogController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create blog.',
-                'error' => config('app.debug') ? $e->getMessage() : null,
+
             ], 500);
         }
     }
