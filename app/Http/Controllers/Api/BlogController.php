@@ -11,9 +11,11 @@ use App\Models\Blog;
 use App\Services\BlogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class BlogController extends Controller
 {
+use AuthorizesRequests;
 
     protected BlogService $blogService;
 
