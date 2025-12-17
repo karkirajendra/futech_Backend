@@ -15,6 +15,8 @@ Route::get('/health', function () {
     ]);
 });
 
+
+
 Route::prefix('auth')->group(function () {
     // Register and login (with rate limiting)
         Route::post('/register', [AuthController::class, 'register'])
@@ -23,25 +25,17 @@ Route::prefix('auth')->group(function () {
             ->name('auth.login');
 
 
-    // Protected authentication routes
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/logout', [AuthController::class, 'logout'])
-            ->name('auth.logout');
-        Route::post('/logout-all', [AuthController::class, 'logoutAll'])
-            ->name('auth.logout-all');
-        Route::get('/user', [AuthController::class, 'user'])
-            ->name('auth.user');
 
-        // Email verification routes
-        Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
-            ->middleware(['signed', 'throttle:6,1'])
-            ->name('verification.verify');
+         // Email verification routes
+         Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+             ->middleware(['signed', 'throttle:6,1'])
+             ->name('verification.verify');
 
-        Route::post('/email/resend', [AuthController::class, 'resendVerification'])
+         Route::post('/email/resend', [AuthController::class, 'resendVerification'])
             ->middleware('throttle:6,1')
             ->name('verification.resend');
     });
-});
+
 
 
 
@@ -65,3 +59,7 @@ Route::fallback(function () {
         'message' => 'Endpoint not found',
     ], 404);
 });
+Route::post('/test', function() {
+    return response()->json(['success' => true, 'message' => 'POST works']);
+});
+

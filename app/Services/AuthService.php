@@ -15,14 +15,14 @@ class AuthService
     public function register(array $data): User
 {
     try {
-        DB::beginTransaction();
+
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
 
-        DB::commit();
+
 
         Log::info('New user registered', [
             'user_id' => $user->id,
@@ -32,7 +32,7 @@ class AuthService
         return $user;
 
     } catch (\Exception $e) {
-        DB::rollBack();
+
 
         Log::error('User registration failed', [
             'email'=> $data['email'],

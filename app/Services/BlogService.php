@@ -28,7 +28,6 @@ class BlogService
     public function createBlog(array $data, User $user): Blog
     {
         try {
-            DB::beginTransaction();
 
             $data['user_id'] = $user->id;
 
@@ -39,8 +38,6 @@ class BlogService
 
             $blog = Blog::create($data);
 
-            DB::commit();
-
             Log::info('Blog created', [
                 'blog_id' => $blog->id,
                 'user_id' => $user->id,
@@ -50,7 +47,7 @@ class BlogService
             return $blog->load('user:id,name,email');
 
         } catch (\Exception $e) {
-            DB::rollBack();
+
 
             // Delete uploaded image if transaction fails
             if (isset($data['image']) && $data['image']) {
@@ -70,7 +67,7 @@ class BlogService
     public function updateBlog(int $id, array $data, User $user): Blog
     {
         try {
-            DB::beginTransaction();
+
 
             $blog = Blog::findOrFail($id);
 
@@ -85,7 +82,6 @@ class BlogService
 
             $blog->update($data);
 
-            DB::commit();
 
             Log::info('Blog updated', [
                 'blog_id' => $blog->id,
@@ -96,7 +92,7 @@ class BlogService
             return $blog->load('user:id,name,email');
 
         } catch (\Exception $e) {
-            DB::rollBack();
+
 
             // Delete newly uploaded image if transaction fails
             if (isset($data['image']) && $data['image']) {
@@ -117,14 +113,14 @@ class BlogService
     public function deleteBlog(int $id, User $user): void
     {
         try {
-            DB::beginTransaction();
+
 
             $blog = Blog::findOrFail($id);
 
             // Soft delete (image will be deleted on force delete)
             $blog->delete();
 
-            DB::commit();
+
 
             Log::info('Blog deleted', [
                 'blog_id' => $blog->id,
@@ -133,7 +129,7 @@ class BlogService
             ]);
 
         } catch (\Exception $e) {
-            DB::rollBack();
+
 
             Log::error('Blog deletion failed', [
                 'blog_id' => $id,

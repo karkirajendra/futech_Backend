@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 class Blog extends Model
 {
-use HasFactory, SoftDeletes;
+use HasFactory;
     protected $fillable = [
         'user_id',
         'title',
