@@ -1,56 +1,215 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Blog\StoreBlogRequest;
+use App\Http\Requests\Blog\UpdateBlogRequest;
+use App\Http\Resources\BlogCollection;
+use App\Http\Resources\BlogResource;
+use App\Models\Blog;
 use App\Services\BlogService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class BlogController extends Controller
 {
-    protected $blogService;
+
+    protected BlogService $blogService;
 
     public function __construct(BlogService $blogService)
     {
         $this->blogService = $blogService;
     }
 
-    // List all blogs
-    public function index()
+  //Get all blogs
+    public function index(Request $request): JsonResponse
     {
-        return response()->json($this->blogService->getAllBlogs());
+        try {
+            $perPage = $request->input('per_page', 15);
+            $blogs = $this->blogService->getAllBlogs($perPage);
+
+            return response()->json([
+                'success' => true,
+                'data' => new BlogCollection($blogs),
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch blogs.',
+                'error' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
+        }
     }
 
-    // Create blog
-    public function store(Request $request)
+   //create a blog
+    public function store(StoreBlogRequest $request): JsonResponse
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'image' => 'nullable|image|max:2048',
-        ]);
+        try {
+            $this->authorize('create', Blog::class);
 
-        $blog = $this->blogService->createBlog($request->all(), $request->user());
+            $blog = $this->blogService->createBlog(
+                $request->validated(),
+                $request->user()
+            );
 
-        return response()->json(['blog'=>$blog, 'message'=>'Blog created successfully']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Blog created successfully',
+                'data' => [
+                    'blog' => new BlogResource($blog),
+                ],
+            ], 201);
+
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to create blogs.',
+            ], 403);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create blog.',
+                'error' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
+        }
     }
 
-    // Show single blog
-    public function show($id)
+    //get a single blog
+    public function show(int $id): JsonResponse
     {
-        return response()->json($this->blogService->getBlog($id));
+        try {
+            $blog = $this->blogService->getBlog($id);
+
+            $this->authorize('view', $blog);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'blog' => new BlogResource($blog),
+                ],
+            ], 200);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Blog not found.',
+            ], 404);
+
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to view this blog.',
+            ], 403);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch blog.',
+                'error' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
+        }
     }
 
-    // Update blog
-    public function update(Request $request, $id)
+    //update a blog
+    public function update(UpdateBlogRequest $request, int $id): JsonResponse
     {
-        $blog = $this->blogService->updateBlog($id, $request->all(), $request->user());
-        return response()->json(['blog'=>$blog, 'message'=>'Blog updated successfully']);
+        try {
+            $blog = Blog::findOrFail($id);
+
+            $this->authorize('update', $blog);
+
+            $updatedBlog = $this->blogService->updateBlog(
+                $id,
+                $request->validated(),
+                $request->user()
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Blog updated successfully',
+                'data' => [
+                    'blog' => new BlogResource($updatedBlog),
+                ],
+            ], 200);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Blog not found.',
+            ], 404);
+
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to update this blog.',
+            ], 403);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update blog.',
+                'error' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
+        }
     }
 
-    // Delete blog
-    public function destroy($id)
+    //delete a blog
+    public function destroy(Request $request, int $id): JsonResponse
     {
-        $this->blogService->deleteBlog($id, request()->user());
-        return response()->json(['message'=>'Blog deleted successfully']);
+        try {
+            $blog = Blog::findOrFail($id);
+
+            $this->authorize('delete', $blog);
+
+            $this->blogService->deleteBlog($id, $request->user());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Blog deleted successfully',
+            ], 200);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Blog not found.',
+            ], 404);
+
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to delete this blog.',
+            ], 403);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete blog.',
+                'error' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
+        }
+    }
+
+   //get a blog by users
+    public function userBlogs(Request $request, int $userId): JsonResponse
+    {
+        try {
+            $perPage = $request->input('per_page', 15);
+            $blogs = $this->blogService->getBlogsByUser($userId, $perPage);
+
+            return response()->json([
+                'success' => true,
+                'data' => new BlogCollection($blogs),
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch user blogs.',
+                'error' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
+        }
     }
 }

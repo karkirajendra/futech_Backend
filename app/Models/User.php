@@ -24,8 +24,33 @@ protected $fillable = [
         'remember_token',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+    /**
+     * Get all blogs for the user.
+     */
     public function blogs()
     {
         return $this->hasMany(Blog::class);
     }
-};
+
+    /**
+     * Get all comments for the user.
+     */
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+
+//     public function isAdmin(): bool
+//     {
+//         return $this->role === 'admin';
+//     }
+ }
