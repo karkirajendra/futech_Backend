@@ -21,8 +21,8 @@ class UserResource extends JsonResource
             'role' => $this->role ?? 'user',
             'email_verified' => !is_null($this->email_verified_at),
             'email_verified_at' => $this->email_verified_at?->toIso8601String(),
-            'created_at' => $this->created_at->toIso8601String(),
-            'updated_at' => $this->updated_at->toIso8601String(),
+            'created_at' => $this->created_at?->toIso8601String(),
+            'updated_at' => $this->updated_at?->toIso8601String(),
 
             // Conditional relationships
             'blogs_count' => $this->when(

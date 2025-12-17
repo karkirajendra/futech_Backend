@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Blog;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UpdateBlogRequest extends FormRequest
 {
@@ -48,5 +50,19 @@ class UpdateBlogRequest extends FormRequest
             ]);
         }
     }
+    
+    /**
+     * Force JSON response on validation errors for API usage.
+     */
+    protected function failedValidation(Validator $validator): void
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $validator->errors(),
+            ], 422)
+        );
     }
+}
 

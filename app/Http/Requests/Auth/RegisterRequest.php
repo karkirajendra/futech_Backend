@@ -4,6 +4,8 @@ namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class RegisterRequest extends FormRequest
 {
@@ -24,7 +26,7 @@ class RegisterRequest extends FormRequest
             'email' => [
                 'required',
                 'string',
-                'email:rfc,dns',
+                'email',
                 'max:255',
                 'unique:users,email',
             ],
@@ -60,5 +62,19 @@ class RegisterRequest extends FormRequest
             'name' => 'full name',
             'email' => 'email address',
         ];
+    }
+
+    /**
+     * Ensure API-style JSON response on validation errors instead of redirecting.
+     */
+    protected function failedValidation(Validator $validator): void
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $validator->errors(),
+            ], 422)
+        );
     }
 }

@@ -4,63 +4,56 @@ namespace App\Policies;
 
 use App\Models\Blog;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class BlogPolicy
 {
     /**
-     * Determine whether the user can view any models.
+     * Anyone (including guests) can view lists of blogs.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(?User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
-     * Determine whether the user can view the model.
+     * Anyone (including guests) can view a single blog.
      */
-    public function view(User $user, Blog $blog): bool
+    public function view(?User $user, Blog $blog): bool
     {
-        return false;
+        return true;
     }
 
     /**
-     * Determine whether the user can create models.
+     * Any authenticated user can create blogs.
      */
     public function create(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
-     * Determine whether the user can update the model.
+     * Only the blog owner can update the blog.
      */
     public function update(User $user, Blog $blog): bool
     {
-        return false;
+        return $user->id === $blog->user_id;
     }
 
     /**
-     * Determine whether the user can delete the model.
+     * Only the blog owner can delete the blog.
      */
     public function delete(User $user, Blog $blog): bool
     {
-        return false;
+        return $user->id === $blog->user_id;
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
     public function restore(User $user, Blog $blog): bool
     {
-        return false;
+        return $user->id === $blog->user_id;
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
     public function forceDelete(User $user, Blog $blog): bool
     {
-        return false;
+        return $user->id === $blog->user_id;
     }
 }

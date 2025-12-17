@@ -56,17 +56,6 @@ class AuthController extends Controller
             ], 401);
         }
 
-        // Check if email is verified
-        if (!$user->hasVerifiedEmail()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Please verify your email address before logging in.',
-                'data' => [
-                    'email_verified' => false,
-                ],
-            ], 403);
-        }
-
         // Create token
         $token = $user->createToken('api-token')->plainTextToken;
 
@@ -125,7 +114,7 @@ class AuthController extends Controller
     public function logout(Request $request): JsonResponse
     {
         try {
-            $this->authService->logoutCurrentDevice($request->user());
+            $this->authService->logout($request->user());
 
             return response()->json([
                 'success' => true,

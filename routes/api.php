@@ -18,7 +18,7 @@ Route::get('/health', function () {
 
 
 Route::prefix('auth')->group(function () {
-    // Register and login (with rate limiting)
+    // Register and login
         Route::post('/register', [AuthController::class, 'register'])
             ->name('auth.register');
         Route::post('/login', [AuthController::class, 'login'])
@@ -36,6 +36,12 @@ Route::prefix('auth')->group(function () {
             ->name('verification.resend');
     });
 
+// Convenience aliases so you can hit /api/register and /api/login directly
+Route::post('/register', [AuthController::class, 'register'])
+    ->name('register');
+Route::post('/login', [AuthController::class, 'login'])
+    ->name('login');
+
 
 
 
@@ -52,7 +58,7 @@ Route::prefix('blogs')->group(function () {
         ->name('blogs.user')
         ->where('userId', '[0-9]+');
 
-    // Add POST route here
+    // Create blog
     Route::post('/', [BlogController::class, 'store'])
         ->name('blogs.store');
 });
