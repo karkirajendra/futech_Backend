@@ -47,21 +47,22 @@ Route::post('/login', [AuthController::class, 'login'])
 
 // Public blog routes (viewable by anyone)
 Route::prefix('blogs')->group(function () {
-    Route::get('/', [BlogController::class, 'index'])
-        ->name('blogs.index');
-
+    Route::get('/', [BlogController::class, 'index'])->name('blogs.index');
     Route::get('/{id}', [BlogController::class, 'show'])
         ->name('blogs.show')
         ->where('id', '[0-9]+');
-
     Route::get('/user/{userId}', [BlogController::class, 'userBlogs'])
         ->name('blogs.user')
         ->where('userId', '[0-9]+');
-
-    // Create blog
-    Route::post('/', [BlogController::class, 'store'])
-        ->name('blogs.store');
 });
+
+// Authenticated blog routes (requires login)
+Route::middleware('auth:sanctum')->prefix('blogs')->group(function () {
+    Route::post('/', [BlogController::class, 'store'])->name('blogs.store');
+    Route::put('/{id}', [BlogController::class, 'update'])->name('blogs.update');
+    Route::delete('/{id}', [BlogController::class, 'destroy'])->name('blogs.destroy');
+});
+
 
 
 
