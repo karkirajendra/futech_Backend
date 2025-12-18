@@ -140,4 +140,23 @@ class AuthController extends Controller
             ],
         ], 200);
     }
+    //test mail
+    public function testSmtp()
+{
+    try {
+        $testEmail = 'rajendrakarki0614@gmail.com'; // Replace with your email
+        $this->authService->sendTestEmail($testEmail);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Test email sent to $testEmail. Check your inbox!"
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to send test email.',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
 }

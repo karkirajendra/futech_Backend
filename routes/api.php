@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Middleware\EnsureTokenIsValid;
 
 
+
 Route::get('/health', function () {
     return response()->json([
         'success' => true,
@@ -73,4 +74,9 @@ Route::fallback(function () {
 Route::post('/test', function() {
     return response()->json(['success' => true, 'message' => 'POST works']);
 });
+
+
+
+Route::get('/test-smtp', [AuthController::class, 'testSmtp']);
+
 

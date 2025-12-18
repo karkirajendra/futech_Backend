@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+
 class AuthService
 {
 
@@ -113,4 +114,15 @@ class AuthService
             'email' => $user->email,
         ]);
     }
+    //check email
+public function sendTestEmail(string $email): void
+{
+    \App\Services\MailService::send(
+        $email,
+        'SMTP Test Email',
+        'This is a test email to confirm SMTP is working.'
+    );
 }
+
+}
+
