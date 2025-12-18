@@ -64,50 +64,42 @@ class BlogService
     }
 
     //update blog
-    public function updateBlog(int $id, array $data, User $user): Blog
-    {
-        try {
+  public function updateBlog(int $id, array $data, User $user): Blog
+{
+    try {
+        $blog = Blog::findOrFail($id);
 
-
-            $blog = Blog::findOrFail($id);
-
-            // Handle image upload
-            if (isset($data['image']) && $data['image']) {
-                // Delete old image
-                $blog->deleteImage();
-
-                // Upload new image
-                $data['image'] = $this->uploadImage($data['image']);
-            }
-
-            $blog->update($data);
-
-
-            Log::info('Blog updated', [
-                'blog_id' => $blog->id,
-                'user_id' => $user->id,
-                'title' => $blog->title,
-            ]);
-
-            return $blog->load('user:id,name,email');
-
-        } catch (\Exception $e) {
-
-
-            // Delete newly uploaded image if transaction fails
-            if (isset($data['image']) && $data['image']) {
-                Storage::disk('public')->delete($data['image']);
-            }
-
-            Log::error('Blog update failed', [
-                'blog_id' => $id,
-                'user_id' => $user->id,
-                'error' => $e->getMessage(),
-            ]);
-
-            throw $e;
+        // Handle image upload
+        if (isset($data['image']) && $data['image']) {
+            $blog->deleteImage();                 // Delete old image
+            $data['image'] = $this->uploadImage($data['image']); // Upload new image
         }
+
+        // Update fields safely
+        $blog->update([
+            'title'   => $data['title'] ?? $blog->title,
+            'content' => $data['content'] ?? $blog->content,
+            'image'   => $data['image'] ?? $blog->image,
+        ]);
+
+        Log::info('Blog updated', [
+            'blog_id' => $blog->id,
+            'user_id' => $user->id,
+            'title'   => $blog->title,
+        ]);
+
+        return $blog->load('user:id,name,email');
+
+    } catch (\Exception $e) {
+        Log::error('Blog update failed', [
+            'blog_id' => $id,
+            'user_id' => $user->id,
+            'error'   => $e->getMessage(),
+        ]);
+        throw $e;
     }
+}
+
 
    //delete a blog
     public function deleteBlog(int $id, User $user): void

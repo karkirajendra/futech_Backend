@@ -119,46 +119,46 @@ use AuthorizesRequests;
 
     //update a blog
     public function update(UpdateBlogRequest $request, int $id): JsonResponse
-    {
-        try {
-            $blog = Blog::findOrFail($id);
+{
+    try {
+        $blog = Blog::findOrFail($id);
 
-            $this->authorize('update', $blog);
+        $this->authorize('update', $blog); // Policy check
 
-            $updatedBlog = $this->blogService->updateBlog(
-                $id,
-                $request->validated(),
-                $request->user()
-            );
+        $updatedBlog = $this->blogService->updateBlog(
+            $id,
+            $request->validated(), // validated fields from UpdateBlogRequest
+            $request->user()
+        );
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Blog updated successfully',
-                'data' => [
-                    'blog' => new BlogResource($updatedBlog),
-                ],
-            ], 200);
+        return response()->json([
+            'success' => true,
+            'message' => 'Blog updated successfully',
+            'data' => [
+                'blog' => new BlogResource($updatedBlog),
+            ],
+        ], 200);
 
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Blog not found.',
-            ], 404);
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Blog not found.',
+        ], 404);
 
-        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'You are not authorized to update this blog.',
-            ], 403);
+    } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'You are not authorized to update this blog.',
+        ], 403);
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update blog.',
-                'error' => config('app.debug') ? $e->getMessage() : null,
-            ], 500);
-        }
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to update blog.',
+            'error'   => config('app.debug') ? $e->getMessage() : null,
+        ], 500);
     }
+}
 
     //delete a blog
     public function destroy(Request $request, int $id): JsonResponse
