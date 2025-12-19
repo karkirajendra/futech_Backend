@@ -35,11 +35,11 @@ class AuthController extends Controller
     {
         try {
             $user = $this->authService->register($request->validated());
-            $user->sendEmailVerificationNotification();
+            $this->otpService->send($user->email, 'email_verification');
 
             return response()->json([
                 'success' => true,
-                'message' => 'User registered successfully. Please verify your email.',
+                'message' => 'User registered successfully. An OTP has been sent to your email for verification.',
                 'data' => [
                     'user' => new UserResource($user),
                 ],
