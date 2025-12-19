@@ -18,6 +18,10 @@ Route::get('/health', function () {
 
 
 
+
+
+
+
 Route::prefix('auth')->group(function () {
     // Public routes
     Route::post('/register', [AuthController::class, 'register'])

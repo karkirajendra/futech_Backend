@@ -254,4 +254,39 @@ class AuthController extends Controller
             ],
         ]);
     }
+    // =========================
+    // PROFILE
+    // =========================
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $request->validate([
+            'name' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'password' => 'nullable|confirmed|min:8',
+            'email_otp' => 'nullable|string',
+        ]);
+
+        $result = $this->authService->updateProfile($request->user(), $request->all());
+
+        if (!$result['success']) {
+            return response()->json([
+                'success' => false,
+                'message' => $result['message'],
+            ], 422);
+        }
+
+        $response = [
+            'success' => true,
+            'message' => $result['message'],
+            'data' => [
+                'user' => new UserResource($result['user']),
+            ],
+        ];
+
+        if (isset($result['requires_otp'])) {
+            $response['requires_otp'] = true;
+        }
+
+        return response()->json($response);
+    }
 }
