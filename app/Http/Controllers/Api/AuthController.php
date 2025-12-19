@@ -59,15 +59,17 @@ class AuthController extends Controller
     // =========================
     public function login(LoginRequest $request): JsonResponse
     {
-        $user = $this->authService->login($request->validated());
+        $result = $this->authService->login($request->validated());
 
-        if (!$user) {
+        if (!$result['success']) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid credentials.',
+                'message' => $result['message'],
+                'data' => $result['data'] ?? [], // Pass any extra data like 'requires_email_verification'
             ], 401);
         }
 
+        $user = $result['user'];
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
@@ -87,7 +89,16 @@ class AuthController extends Controller
     // =========================
     public function sendEmailVerificationOtp(Request $request): JsonResponse
     {
-        $this->otpService->send($request->user()->email, 'email_verification');
+        $email = $request->user() ? $request->user()->email : $request->email;
+        
+        if (!$email) {
+             return response()->json([
+                'success' => false,
+                'message' => 'Email is required.',
+            ], 422);
+        }
+
+        $this->otpService->send($email, 'email_verification');
 
         return response()->json([
             'success' => true,
@@ -95,12 +106,15 @@ class AuthController extends Controller
         ]);
     }
 
-    public function verifyEmailOtp(Request $request): JsonResponse
+    public function verifyEmailWithOtp(Request $request): JsonResponse
     {
-        $request->validate(['otp' => 'required|string']);
+        $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required|string'
+        ]);
 
         if (! $this->otpService->verify(
-            $request->user()->email,
+            $request->email,
             $request->otp,
             'email_verification'
         )) {
@@ -110,7 +124,11 @@ class AuthController extends Controller
             ], 422);
         }
 
-        $request->user()->markEmailAsVerified();
+        $user = User::where('email', $request->email)->first();
+
+        if ($user) {
+            $user->markEmailAsVerified();
+        }
 
         return response()->json([
             'success' => true,
