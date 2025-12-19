@@ -19,29 +19,75 @@ Route::get('/health', function () {
 
 
 Route::prefix('auth')->group(function () {
-    // Register and login
-        Route::post('/register', [AuthController::class, 'register'])
-            ->name('auth.register');
-        Route::post('/login', [AuthController::class, 'login'])
-            ->name('auth.login');
+    // Public routes
+    Route::post('/register', [AuthController::class, 'register'])
+        ->name('auth.register');
+    Route::post('/login', [AuthController::class, 'login'])
+        ->name('auth.login');
+
+    // Password reset routes (public)
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])
+        ->middleware('throttle:5,1')
+        ->name('auth.forgot-password');
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])
+        ->middleware('throttle:5,1')
+        ->name('auth.reset-password');
+
+    // Email verification routes
+    Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+
+    Route::post('/email/resend', [AuthController::class, 'resendVerification'])
+        ->middleware('throttle:6,1')
+        ->name('verification.resend');
+
+    // Public route to resend verification by email (for unverified users) - sends signed URL
+    Route::post('/email/resend-by-email', [AuthController::class, 'resendVerificationByEmail'])
+        ->middleware('throttle:6,1')
+        ->name('verification.resend-by-email');
+
+    // OTP-based email verification (alternative to signed URL)
+    Route::post('/email/send-otp', [AuthController::class, 'sendEmailVerificationOtp'])
+        ->middleware('throttle:6,1')
+        ->name('verification.send-otp');
+    Route::post('/email/verify-otp', [AuthController::class, 'verifyEmailWithOtp'])
+        ->middleware('throttle:6,1')
+        ->name('verification.verify-otp');
+
+    // Authenticated routes
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/logout', [AuthController::class, 'logout'])
+            ->name('auth.logout');
+        Route::get('/user', [AuthController::class, 'user'])
+            ->name('auth.user');
+        Route::put('/profile', [AuthController::class, 'updateProfile'])
+            ->name('auth.update-profile');
 
 
-
-         // Email verification routes
-         Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
-             ->middleware(['signed', 'throttle:6,1'])
-             ->name('verification.verify');
-
-         Route::post('/email/resend', [AuthController::class, 'resendVerification'])
-            ->middleware('throttle:6,1')
-            ->name('verification.resend');
+        // Helper routes (for testing)
+        Route::get('/status', [AuthController::class, 'checkStatus'])
+            ->name('auth.status');
     });
+});
+
+// Helper endpoints (DEV ONLY - Remove in production!)
+Route::get('/get-otp', [AuthController::class, 'getOtp'])
+    ->name('get-otp');
+Route::get('/check-email', [AuthController::class, 'checkEmail'])
+    ->name('check-email');
 
 // Convenience aliases so you can hit /api/register and /api/login directly
 Route::post('/register', [AuthController::class, 'register'])
     ->name('register');
 Route::post('/login', [AuthController::class, 'login'])
     ->name('login');
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])
+    ->middleware('throttle:5,1')
+    ->name('forgot-password');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])
+    ->middleware('throttle:5,1')
+    ->name('reset-password');
 
 
 

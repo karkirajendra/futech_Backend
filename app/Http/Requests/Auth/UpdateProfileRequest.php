@@ -1,11 +1,12 @@
 <?php
 
 namespace App\Http\Requests\Auth;
+
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class LoginRequest extends FormRequest
+class UpdateProfileRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -15,24 +16,25 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string'],
-            'two_factor_code' => ['nullable', 'string', 'size:6'],
+            'name' => ['sometimes', 'string', 'max:255'],
+            'email' => ['sometimes', 'email', 'max:255'],
+            'email_otp' => ['nullable', 'string', 'size:6'],
+            'password' => ['sometimes', 'string', 'min:8'],
         ];
     }
 
-     public function messages(): array
+    public function messages(): array
     {
         return [
-            'email.required' => 'Email address is required.',
+            'name.string' => 'Name must be a string.',
+            'name.max' => 'Name must not exceed 255 characters.',
             'email.email' => 'Please provide a valid email address.',
-            'password.required' => 'Password is required.',
+            'email.max' => 'Email must not exceed 255 characters.',
+            'email_otp.size' => 'OTP must be 6 digits.',
+            'password.min' => 'Password must be at least 8 characters.',
         ];
     }
 
-    /**
-     * Ensure API-style JSON response on validation errors instead of redirecting.
-     */
     protected function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(
@@ -44,4 +46,3 @@ class LoginRequest extends FormRequest
         );
     }
 }
-

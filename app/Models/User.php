@@ -16,6 +16,8 @@ protected $fillable = [
         'email',
         'password',
         'role',
+        'pending_email',
+        'pending_email_otp_verified',
     ];
 
 
@@ -29,6 +31,7 @@ protected $fillable = [
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'pending_email_otp_verified' => 'boolean',
         ];
     }
 
@@ -53,4 +56,12 @@ protected $fillable = [
 //     {
 //         return $this->role === 'admin';
 //     }
+
+    /**
+     * Get OTP relationship
+     */
+    public function otps()
+    {
+        return $this->hasMany(Otp::class, 'email', 'email');
+    }
  }

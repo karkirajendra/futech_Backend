@@ -26,7 +26,7 @@ class RegisterRequest extends FormRequest
             'email' => [
                 'required',
                 'string',
-                'email',
+                'email:rfc,dns',
                 'max:255',
                 'unique:users,email',
             ],
@@ -42,6 +42,19 @@ class RegisterRequest extends FormRequest
                     // ->uncompromised(),
             ],
         ];
+    }
+
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        // Normalize email: trim whitespace and convert to lowercase
+        if ($this->has('email')) {
+            $this->merge([
+                'email' => strtolower(trim($this->input('email'))),
+            ]);
+        }
     }
 
      public function messages(): array
