@@ -42,18 +42,16 @@ Route::prefix('auth')->group(function () {
         ->middleware('throttle:6,1')
         ->name('verification.resend');
 
-    // Public route to resend verification by email (for unverified users) - sends signed URL
-    Route::post('/email/resend-by-email', [AuthController::class, 'resendVerificationByEmail'])
-        ->middleware('throttle:6,1')
-        ->name('verification.resend-by-email');
 
-    // OTP-based email verification (alternative to signed URL)
+
+    // OTP-based email verification
+    Route::middleware('throttle:6,1')->group(function () {
     Route::post('/email/send-otp', [AuthController::class, 'sendEmailVerificationOtp'])
-        ->middleware('throttle:6,1')
         ->name('verification.send-otp');
+
     Route::post('/email/verify-otp', [AuthController::class, 'verifyEmailWithOtp'])
-        ->middleware('throttle:6,1')
         ->name('verification.verify-otp');
+});
 
     // Authenticated routes
     Route::middleware('auth:sanctum')->group(function () {

@@ -14,12 +14,10 @@ use App\Services\OtpService;
 class AuthService
 {
     protected OtpService $otpService;
-    protected Google2FA $google2fa;
 
     public function __construct(OtpService $otpService)
     {
         $this->otpService = $otpService;
-        $this->google2fa = new Google2FA();
     }
 
     //register a new user
@@ -112,27 +110,6 @@ class AuthService
                 'message' => 'Please verify your email address before logging in.',
                 'requires_email_verification' => true,
             ];
-        }
-
-        // Check if 2FA is enabled
-        if ($user->hasTwoFactorEnabled()) {
-            // If 2FA code is provided, verify it
-            if (isset($credentials['two_factor_code'])) {
-                if (!$this->verifyTwoFactorCode($user, $credentials['two_factor_code'])) {
-                    return [
-                        'success' => false,
-                        'message' => 'Invalid 2FA code',
-                        'requires_two_factor' => true,
-                    ];
-                }
-            } else {
-                // 2FA is enabled but code not provided
-                return [
-                    'success' => false,
-                    'message' => 'Two-factor authentication code is required',
-                    'requires_two_factor' => true,
-                ];
-            }
         }
 
         Log::info('User logged in', [

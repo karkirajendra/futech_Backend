@@ -11,6 +11,8 @@ use App\Services\OtpService;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\EmailVerificationNotification;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -78,46 +80,7 @@ class AuthController extends Controller
         ]);
     }
 
-    // =========================
-    // EMAIL VERIFICATION (LINK)
-    // =========================
-    public function verifyEmail(EmailVerificationRequest $request): JsonResponse
-    {
-        try {
-            $result = $this->authService->verifyEmail($request);
 
-            return response()->json([
-                'success' => true,
-                'message' => $result['message'],
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Email verification failed.',
-                'error' => config('app.debug') ? $e->getMessage() : null,
-            ], 500);
-        }
-    }
-
-    public function resendVerification(Request $request): JsonResponse
-    {
-        try {
-            $result = $this->authService->resendVerification($request);
-
-            return response()->json([
-                'success' => true,
-                'message' => $result['message'],
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to resend verification email.',
-                'error' => config('app.debug') ? $e->getMessage() : null,
-            ], 500);
-        }
-    }
 
     // =========================
     // EMAIL VERIFICATION (OTP)
