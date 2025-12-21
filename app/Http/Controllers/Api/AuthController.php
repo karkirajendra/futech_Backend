@@ -12,7 +12,6 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
-use App\Notifications\EmailVerificationNotification;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -28,9 +27,9 @@ class AuthController extends Controller
         $this->otpService = $otpService;
     }
 
-    // =========================
+
     // REGISTER
-    // =========================
+
     public function register(RegisterRequest $request): JsonResponse
     {
         try {
@@ -54,9 +53,9 @@ class AuthController extends Controller
         }
     }
 
-    // =========================
+
     // LOGIN
-    // =========================
+
     public function login(LoginRequest $request): JsonResponse
     {
         $result = $this->authService->login($request->validated());
@@ -83,14 +82,12 @@ class AuthController extends Controller
     }
 
 
-
-    // =========================
     // EMAIL VERIFICATION (OTP)
-    // =========================
+
     public function sendEmailVerificationOtp(Request $request): JsonResponse
     {
         $email = $request->user() ? $request->user()->email : $request->email;
-        
+
         if (!$email) {
              return response()->json([
                 'success' => false,
@@ -136,9 +133,8 @@ class AuthController extends Controller
         ]);
     }
 
-    // =========================
     // FORGOT PASSWORD (OTP)
-    // =========================
+
     public function forgotPassword(Request $request): JsonResponse
     {
         $request->validate([
@@ -182,9 +178,8 @@ class AuthController extends Controller
         ]);
     }
 
-    // =========================
     // UPDATE EMAIL (OTP)
-    // =========================
+
     public function sendUpdateEmailOtp(Request $request): JsonResponse
     {
         $request->validate([
@@ -229,9 +224,8 @@ class AuthController extends Controller
     }
 
 
-    // =========================
     // LOGOUT
-    // =========================
+
     public function logout(Request $request): JsonResponse
     {
         $this->authService->logout($request->user());
@@ -242,9 +236,9 @@ class AuthController extends Controller
         ]);
     }
 
-    // =========================
+
     // CURRENT USER
-    // =========================
+
     public function user(Request $request): JsonResponse
     {
         return response()->json([
@@ -254,9 +248,8 @@ class AuthController extends Controller
             ],
         ]);
     }
-    // =========================
     // PROFILE
-    // =========================
+
     public function updateProfile(Request $request): JsonResponse
     {
         $request->validate([

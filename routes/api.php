@@ -17,11 +17,6 @@ Route::get('/health', function () {
 });
 
 
-
-
-
-
-
 Route::prefix('auth')->group(function () {
     // Public routes
     Route::post('/register', [AuthController::class, 'register'])
@@ -72,27 +67,6 @@ Route::prefix('auth')->group(function () {
             ->name('auth.status');
     });
 });
-
-// Helper endpoints (DEV ONLY - Remove in production!)
-Route::get('/get-otp', [AuthController::class, 'getOtp'])
-    ->name('get-otp');
-Route::get('/check-email', [AuthController::class, 'checkEmail'])
-    ->name('check-email');
-
-// Convenience aliases so you can hit /api/register and /api/login directly
-Route::post('/register', [AuthController::class, 'register'])
-    ->name('register');
-Route::post('/login', [AuthController::class, 'login'])
-    ->name('login');
-Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])
-    ->middleware('throttle:5,1')
-    ->name('forgot-password');
-Route::post('/reset-password', [AuthController::class, 'resetPassword'])
-    ->middleware('throttle:5,1')
-    ->name('reset-password');
-
-
-
 
 // Public blog routes (viewable by anyone)
 Route::prefix('blogs')->group(function () {

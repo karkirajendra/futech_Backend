@@ -10,13 +10,14 @@ use Illuminate\Support\Facades\Storage;
 
 class BlogService
 {
+//fetch blogs
    public function getAllBlogs(int $perPage = 15): LengthAwarePaginator
     {
         return Blog::with(['user:id,name,email'])
             ->latest()
             ->paginate($perPage);
     }
-
+//fetch single blog by id
       public function getBlog(int $id): Blog
     {
         return Blog::with(['user:id,name,email', 'comments.user:id,name'])

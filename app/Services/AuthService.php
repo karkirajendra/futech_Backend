@@ -274,14 +274,5 @@ class AuthService
         return $response;
     }
 
-    // Generate recovery codes
-    private function generateRecoveryCodes(int $count = 8): array
-    {
-        $codes = [];
-        for ($i = 0; $i < $count; $i++) {
-            $codes[] = strtoupper(bin2hex(random_bytes(4)));
-        }
-        return $codes;
-    }
 }
 
