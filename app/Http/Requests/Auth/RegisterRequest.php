@@ -17,6 +17,9 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'firstname' => 'required|string|max:50',
+            //'middlename' => 'nullable|string|max:50',
+            'lastname' => 'required|string|max:50',
             'name' => [
                 'required',
                 'string',
@@ -37,9 +40,9 @@ class RegisterRequest extends FormRequest
                 Password::min(8)
                     ->letters()
                     ->mixedCase()
-                    // ->numbers()
-                    // ->symbols()
-                    // ->uncompromised(),
+                // ->numbers()
+                // ->symbols()
+                // ->uncompromised(),
             ],
         ];
     }
@@ -57,7 +60,7 @@ class RegisterRequest extends FormRequest
         }
     }
 
-     public function messages(): array
+    public function messages(): array
     {
         return [
             'name.required' => 'Please provide your name.',
@@ -67,11 +70,18 @@ class RegisterRequest extends FormRequest
             'email.unique' => 'This email is already registered.',
             'password.required' => 'Password is required.',
             'password.confirmed' => 'Password confirmation does not match.',
+            'firstname.required' => 'firstname requried',
+           // 'middlename.required' => 'middlename requried',
+            'lastname.required' => 'lastname requried'
+
         ];
     }
     public function attributes(): array
     {
         return [
+            'firstname' => 'first name',
+            'middlename' => 'middle name',
+            'lastname' => 'last name',
             'name' => 'full name',
             'email' => 'email address',
         ];

@@ -45,12 +45,12 @@ Route::prefix('auth')->group(function () {
 
     // OTP-based email verification
     Route::middleware('throttle:6,1')->group(function () {
-    Route::post('/email/send-otp', [AuthController::class, 'sendEmailVerificationOtp'])
-        ->name('verification.send-otp');
+        Route::post('/email/send-otp', [AuthController::class, 'sendEmailVerificationOtp'])
+            ->name('verification.send-otp');
 
-    Route::post('/email/verify-otp', [AuthController::class, 'verifyEmailWithOtp'])
-        ->name('verification.verify-otp');
-});
+        Route::post('/email/verify-otp', [AuthController::class, 'verifyEmailWithOtp'])
+            ->name('verification.verify-otp');
+    });
 
     // Authenticated routes
     Route::middleware('auth:sanctum')->group(function () {
@@ -83,17 +83,13 @@ Route::prefix('blogs')->group(function () {
     });
 });
 
-
-
-
-
 Route::fallback(function () {
     return response()->json([
         'success' => false,
         'message' => 'Endpoint not found',
     ], 404);
 });
-Route::post('/test', function() {
+Route::post('/test', function () {
     return response()->json(['success' => true, 'message' => 'POST works']);
 });
 

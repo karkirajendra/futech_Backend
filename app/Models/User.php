@@ -9,11 +9,15 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable implements MustVerifyEmail{
+class User extends Authenticatable implements MustVerifyEmail
+{
     use HasApiTokens, HasFactory, Notifiable;
 
-protected $fillable = [
+    protected $fillable = [
         'name',
+        'firstname',
+        'middlename',
+        'lastname',
         'email',
         'password',
         'role',
@@ -53,7 +57,7 @@ protected $fillable = [
     }
 
 
-//     public function isAdmin(): bool
+    //     public function isAdmin(): bool
 //     {
 //         return $this->role === 'admin';
 //     }
@@ -65,4 +69,4 @@ protected $fillable = [
     {
         return $this->hasMany(Otp::class, 'email', 'email');
     }
- }
+}

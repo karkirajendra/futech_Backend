@@ -9,15 +9,25 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('pending_email')->nullable();
-            $table->boolean('pending_email_otp_verified')->default(false);
+            if (!Schema::hasColumn('users', 'pending_email')) {
+                $table->string('pending_email')->nullable();
+            }
+
+            if (!Schema::hasColumn('users', 'pending_email_otp_verified')) {
+                $table->boolean('pending_email_otp_verified')->default(false);
+            }
         });
     }
 
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['pending_email', 'pending_email_otp_verified']);
+            if (Schema::hasColumn('users', 'pending_email')) {
+                $table->dropColumn('pending_email');
+            }
+            if (Schema::hasColumn('users', 'pending_email_otp_verified')) {
+                $table->dropColumn('pending_email_otp_verified');
+            }
         });
     }
 };

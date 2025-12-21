@@ -15,6 +15,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+
 class BlogController extends Controller
 {
 use AuthorizesRequests;
@@ -66,7 +67,7 @@ use AuthorizesRequests;
                 ],
             ], 201);
 
-        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+        } catch (AuthorizationException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'You are not authorized to create blogs.',
@@ -96,13 +97,13 @@ use AuthorizesRequests;
                 ],
             ], 200);
 
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Blog not found.',
             ], 404);
 
-        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+        } catch (AuthorizationException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'You are not authorized to view this blog.',
@@ -139,13 +140,13 @@ use AuthorizesRequests;
             ],
         ], 200);
 
-    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+    } catch (ModelNotFoundException $e) {
         return response()->json([
             'success' => false,
             'message' => 'Blog not found.',
         ], 404);
 
-    } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+    } catch (AuthorizationException $e) {
         return response()->json([
             'success' => false,
             'message' => 'You are not authorized to update this blog.',
@@ -175,13 +176,13 @@ use AuthorizesRequests;
                 'message' => 'Blog deleted successfully',
             ], 200);
 
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Blog not found.',
             ], 404);
 
-        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+        } catch (AuthorizationException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'You are not authorized to delete this blog.',

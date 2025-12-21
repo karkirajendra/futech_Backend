@@ -22,39 +22,43 @@ class AuthService
 
     //register a new user
     public function register(array $data): User
-{
-    try {
+    {
+        try {
 
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
-
-
-
-        Log::info('New user registered', [
-            'user_id' => $user->id,
-            'email' => $user->email,
-        ]);
-
-        return $user;
-
-    } catch (\Exception $e) {
+            $user = User::create([
+                'firstname' => $data['firstname'] ,
+                'middlename' => $data['middlename'] ?? null,
+                'lastname' => $data['lastname'],
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+            ]);
 
 
-        Log::error('User registration failed', [
-            'email'=> $data['email'],
-            'error'=> $e->getMessage(),
-        ]);
-        throw $e;
+
+            Log::info('New user registered', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+            ]);
+
+            return $user;
+
+        } catch (\Exception $e) {
+
+
+            Log::error('User registration failed', [
+                'email' => $data['email'],
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
+        }
     }
-}
 
     //Email verification
-      public function verifyEmail(EmailVerificationRequest $request){
-            $request->fulfill();
-             Log::info('Email verified', [
+    public function verifyEmail(EmailVerificationRequest $request)
+    {
+        $request->fulfill();
+        Log::info('Email verified', [
             'user_id' => $request->user()->id,
             'email' => $request->user()->email,
         ]);
@@ -62,10 +66,10 @@ class AuthService
         return [
             'message' => 'Email verified successfully',
         ];
-        }
+    }
 
-        //email resend verification
-        public function resendVerification(Request $request): array
+    //email resend verification
+    public function resendVerification(Request $request): array
     {
         $user = $request->user();
 
@@ -119,7 +123,7 @@ class AuthService
 
         return ['success' => true, 'user' => $user];
     }
-//Logout
+    //Logout
     public function logout(User $user): void
     {
         // Revoke all tokens
